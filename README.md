@@ -5,12 +5,12 @@
 
 ## 概要
 
-**フロントエンド**: Next.js (pages router) + TypeScript + MUI + React Hook Form (zod連携)
-**バックエンド**: Go + chi + xo + PostgreSQL (CloudSQL)
-**インフラ:** Terraform で GCP (GKE Autopilot, CloudSQL, Artifact Registry など) を構築
-**CI/CD**: GitHub Actions を用いたビルド・テスト・デプロイ
+- **フロントエンド**: Next.js (pages router) + TypeScript + MUI + React Hook Form (zod連携)
+- **バックエンド**: Go + chi + xo + PostgreSQL (CloudSQL)
+- **インフラ:** Terraform で GCP (GKE Autopilot, CloudSQL, Artifact Registry など) を構築
+- **CI/CD**: GitHub Actions を用いたビルド・テスト・デプロイ
 
-簡単な “TODOリスト”を題材に、ローカル環境からクラウド環境へのデプロイまでを通しで実践できるようにしています。
+簡単な TODOリストを題材に、ローカル環境からクラウド環境へのデプロイまでを通しで実践できるようにしています。
 
 ## ディレクトリ構成
 ```text
