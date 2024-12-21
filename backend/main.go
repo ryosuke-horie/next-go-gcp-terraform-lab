@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -12,9 +13,17 @@ func main() {
 
 	// /で受け付けるハンドラーを登録
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("hello chi"))
+		_, err := w.Write([]byte("hello chi"))
+		if err != nil {
+			// ログにエラーを出力
+			log.Printf("failed to write response: %v", err)
+		}
 	})
 
 	// ポート3333でサーバーを起動
-	http.ListenAndServe(":3333", r)
+	err := http.ListenAndServe(":3333", r)
+	if err != nil {
+		// ログにエラーを出力
+		log.Printf("failed to start server: %v", err)
+	}
 }
