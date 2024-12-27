@@ -1,0 +1,96 @@
+// handlers/task_handlers.go
+package handlers
+
+import (
+	"database/sql"
+	"encoding/json"
+	"log"
+	"net/http"
+	"time"
+
+	"github.com/ryosuke-horie/next-go-gcp-terraform-k8s-lab/models"
+	"github.com/ryosuke-horie/next-go-gcp-terraform-k8s-lab/repository"
+)
+
+type TaskHandler struct {
+	Repo repository.TaskRepository
+}
+
+// コンストラクタ
+func NewTaskHandler(repo repository.TaskRepository) *TaskHandler {
+	return &TaskHandler{Repo: repo}
+}
+
+// タスク作成処理
+func (h *TaskHandler) CreateTaskHandler(w http.ResponseWriter, r *http.Request) {
+	var input struct {
+		Title  string `json:"title"`
+		Detail string `json:"detail"`
+	}
+
+	// リクエストボディをデコード
+	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
+		http.Error(w, "無効なリクエストボディ", http.StatusBadRequest)
+		return
+	}
+
+	// タスクを作成
+	task := &models.Task{
+		Title:       input.Title,
+		Detail:      sql.NullString{String: input.Detail, Valid: input.Detail != ""},
+		IsCompleted: false,
+		CreatedAt:   time.Now(),
+	}
+
+	// Insert
+	if err := h.Repo.CreateTask(r.Context(), task); err != nil {
+		log.Printf("タスクの挿入に失敗しました。:%v", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	// 作成したタスクをレスポンスとして返す
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	if err := json.NewEncoder(w).Encode(task); err != nil {
+		log.Printf("レスポンスのエンコードに失敗しました。: %v", err)
+	}
+}
+
+func (h *TaskHandler) ListTaskHandler(w http.ResponseWriter, r *http.Request) {
+	tasks, err := h.Repo.ListTasks(r.Context())
+	if err != nil {
+		log.Printf("タスクの取得に失敗しました。: %v", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+	}
+
+	// レスポンスの設定と送信
+	w.Header().Set("Content-Type", "application/json")
+	if err := json.NewEncoder(w).Encode(tasks); err != nil {
+		log.Printf("レスポンスのエンコードに失敗しました。: %v", err)
+		http.Error(w, "レスポンスの生成に失敗しました。", http.StatusInternalServerError)
+		return
+	}
+}
+
+func (h *TaskHandler) DeleteTaskHandler(w http.ResponseWriter, r *http.Request) {
+	var input struct {
+		ID int `json:"id"`
+	}
+
+	// リクエストボディをデコード
+	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
+		http.Error(w, "無効なリクエストボディ", http.StatusBadRequest)
+		return
+	}
+
+	// タスクを削除
+	if err := h.Repo.DeleteTask(r.Context(), input.ID); err != nil {
+		log.Printf("タスクの削除に失敗しました。: %v", err)
+		http.Error(w, "タスクの削除に失敗しました。", http.StatusInternalServerError)
+		return
+	}
+
+	// 削除成功時に204 No Contentを返す
+	w.WriteHeader(http.StatusNoContent)
+}
