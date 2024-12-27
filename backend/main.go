@@ -6,6 +6,7 @@ import (
 
 	_ "github.com/lib/pq"
 	"github.com/ryosuke-horie/next-go-gcp-terraform-k8s-lab/models"
+	"github.com/ryosuke-horie/next-go-gcp-terraform-k8s-lab/repository"
 )
 
 func main() {
@@ -20,8 +21,12 @@ func main() {
 	}
 	defer db.Close()
 
+	// リポジトリの初期化
+	// タスク
+	repo := repository.NewTaskRepository(db)
+
 	// ルーターを作成
-	r := NewRouter(db)
+	r := NewRouter(repo)
 
 	// ポート3333でサーバーを起動
 	err = http.ListenAndServe(":3333", r)
