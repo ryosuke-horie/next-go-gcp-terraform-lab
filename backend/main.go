@@ -17,26 +17,12 @@ func main() {
 	models.SetLogger(log.Printf)
 	models.SetErrorLogger(log.Printf)
 
-	// DB接続情報
-	dbUser := "postgres"
-	dbPassword := "password"
-	dbName := "xodb"
-	dbHost := "localhost"
-	dbPort := "5432"
-	// DB接続文字列作成
-	connStr := "postgres://" + dbUser + ":" + dbPassword + "@" + dbHost + ":" + dbPort + "/" + dbName + "?sslmode=disable"
-
 	// DB接続
-	db, err := sql.Open("postgres", connStr)
+	db, err := initDB()
 	if err != nil {
-		log.Fatalf("データベースへ接続に失敗しました: %v", err)
+		log.Print(err)
 	}
 	defer db.Close()
-
-	// データベース接続の確認
-	if err := db.Ping(); err != nil {
-		log.Fatalf("データベースへのpingに失敗しました: %v", err)
-	}
 
 	// ルーターを作成
 	r := chi.NewRouter()
