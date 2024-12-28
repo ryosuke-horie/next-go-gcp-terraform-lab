@@ -21,6 +21,16 @@ func NewTaskHandler(repo repository.TaskRepository) *TaskHandler {
 	return &TaskHandler{Repo: repo}
 }
 
+// レスポンス用の構造体
+// Detailをstringとして直接レスポンスで返したいため実装
+type TaskResponse struct {
+	ID          int       `json:"id"`
+	Title       string    `json:"title"`
+	Detail      string    `json:"detail"`
+	IsCompleted bool      `json:"is_completed"`
+	CreatedAt   time.Time `json:"created_at"`
+}
+
 // タスク作成処理
 func (h *TaskHandler) CreateTaskHandler(w http.ResponseWriter, r *http.Request) {
 	var input struct {
@@ -49,10 +59,19 @@ func (h *TaskHandler) CreateTaskHandler(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
+	// TaskResponse にマッピング
+	response := TaskResponse{
+		ID:          task.ID,
+		Title:       task.Title,
+		Detail:      task.Detail.String, // sql.NullString から string を取得
+		IsCompleted: task.IsCompleted,
+		CreatedAt:   task.CreatedAt,
+	}
+
 	// 作成したタスクをレスポンスとして返す
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
-	if err := json.NewEncoder(w).Encode(task); err != nil {
+	if err := json.NewEncoder(w).Encode(response); err != nil {
 		log.Printf("レスポンスのエンコードに失敗しました。: %v", err)
 	}
 }
