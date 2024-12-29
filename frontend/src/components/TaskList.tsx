@@ -7,7 +7,7 @@ import { z } from "zod";
 import { type TaskResponse, TaskResponseSchema } from "../types/Task";
 import TaskItem from "./TaskItem";
 
-const initialTodos = [
+const initialTasks = [
 	{
 		id: 1,
 		title: "サンプルTODO 1",
@@ -25,47 +25,47 @@ const initialTodos = [
 ];
 
 // 検証
-const parsedTodos = z.array(TaskResponseSchema).safeParse(initialTodos);
+const parsedTasks = z.array(TaskResponseSchema).safeParse(initialTasks);
 
 // zodによるバリデーション
-if (!parsedTodos.success) {
-	console.error("初期データが無効:", parsedTodos.error.format());
+if (!parsedTasks.success) {
+	console.error("初期データが無効:", parsedTasks.error.format());
 	throw new Error("無効な初期データ");
 }
 
 const TaskList: React.FC = () => {
-	const [todos, setTodos] = useState<TaskResponse[]>(parsedTodos.data);
-	const [newTodo, setNewTodo] = useState<string>("");
+	const [tasks, setTasks] = useState<TaskResponse[]>(parsedTasks.data);
+	const [newTask, setNewTask] = useState<string>("");
 
-	const handleAddTodo = () => {
-		if (newTodo.trim() === "") {
+	const handleAddTask = () => {
+		if (newTask.trim() === "") {
 			alert("TODOアイテムを入力してください。");
 			return;
 		}
 
 		const newTaskItem: TaskResponse = {
 			id: Date.now(),
-			title: newTodo.trim(),
+			title: newTask.trim(),
 			detail: "",
 			is_completed: false,
 			created_at: new Date().toISOString(),
 		};
 
-		setTodos([...todos, newTaskItem]);
-		setNewTodo("");
+		setTasks([...tasks, newTaskItem]);
+		setNewTask("");
 		alert(`追加したTODO: "${newTaskItem.title}"`);
 	};
 
 	const handleToggle = (id: number) => {
-		setTodos(
-			todos.map((todo) =>
-				todo.id === id ? { ...todo, is_completed: !todo.is_completed } : todo,
+		setTasks(
+			tasks.map((task) =>
+				task.id === id ? { ...task, is_completed: !task.is_completed } : task,
 			),
 		);
 	};
 
 	const handleDelete = (id: number) => {
-		setTodos(todos.filter((todo) => todo.id !== id));
+		setTasks(tasks.filter((task) => task.id !== id));
 	};
 
 	return (
@@ -76,23 +76,23 @@ const TaskList: React.FC = () => {
 					label="新しいTODO"
 					variant="outlined"
 					fullWidth
-					value={newTodo}
-					onChange={(e) => setNewTodo(e.target.value)}
+					value={newTask}
+					onChange={(e) => setNewTask(e.target.value)}
 				/>
 				<Button
 					variant="contained"
 					color="primary"
 					style={{ marginLeft: 8 }}
-					onClick={handleAddTodo}
+					onClick={handleAddTask}
 				>
 					追加
 				</Button>
 			</div>
 			<List>
-				{todos.map((todo) => (
+				{tasks.map((task) => (
 					<TaskItem
-						key={todo.id}
-						task={todo}
+						key={task.id}
+						task={task}
 						onToggle={handleToggle}
 						onDelete={handleDelete}
 					/>
