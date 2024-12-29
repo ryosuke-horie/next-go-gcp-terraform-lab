@@ -81,11 +81,25 @@ func (h *TaskHandler) ListTaskHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Printf("タスクの取得に失敗しました。: %v", err)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
 	}
 
-	// レスポンスの設定と送信
+	// models.TaskからTaskResponseへのマッピング
+	var responseTasks []TaskResponse
+	for _, task := range tasks {
+		responseTask := TaskResponse{
+			ID:          task.ID,
+			Title:       task.Title,
+			Detail:      task.Detail.String, // sql.NullStringからstringを取得
+			IsCompleted: task.IsCompleted,
+			CreatedAt:   task.CreatedAt,
+		}
+		responseTasks = append(responseTasks, responseTask)
+	}
+
+	/// レスポンスの設定と送信
 	w.Header().Set("Content-Type", "application/json")
-	if err := json.NewEncoder(w).Encode(tasks); err != nil {
+	if err := json.NewEncoder(w).Encode(responseTasks); err != nil {
 		log.Printf("レスポンスのエンコードに失敗しました。: %v", err)
 		http.Error(w, "レスポンスの生成に失敗しました。", http.StatusInternalServerError)
 		return
