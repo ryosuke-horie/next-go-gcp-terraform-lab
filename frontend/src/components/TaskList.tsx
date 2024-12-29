@@ -1,12 +1,10 @@
-// app/src/components/TaskList.tsx
-
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, List, Paper, Stack, TextField } from "@mui/material";
 import type React from "react";
-import { useState } from "react";
 import { useForm } from "react-hook-form";
+import useSWR, { mutate } from "swr";
 import { z } from "zod";
 import {
 	type NewTask,
@@ -16,34 +14,33 @@ import {
 } from "../types/Task";
 import TaskItem from "./TaskItem";
 
-const initialTasks = [
-	{
-		id: 1,
-		title: "サンプルTODO 1",
-		detail: "詳細1",
-		is_completed: false,
-		created_at: new Date().toISOString(),
-	},
-	{
-		id: 2,
-		title: "サンプルTODO 2",
-		detail: "詳細2",
-		is_completed: true,
-		created_at: new Date().toISOString(),
-	},
-];
-
-// 検証
-const parsedTasks = z.array(TaskResponseSchema).safeParse(initialTasks);
-
-// zodによるバリデーション
-if (!parsedTasks.success) {
-	console.error("初期データが無効:", parsedTasks.error.format());
-	throw new Error("無効な初期データ");
+interface TaskListProps {
+	initialTasks: TaskResponse[];
 }
 
-const TaskList: React.FC = () => {
-	const [tasks, setTasks] = useState<TaskResponse[]>(parsedTasks.data);
+// swrのフェッチ関数
+const fetcher = async (url: string): Promise<TaskResponse[]> => {
+	const response = await fetch(url);
+	if (!response.ok) {
+		throw new Error("タスクの取得に失敗しました。");
+	}
+
+	const data = await response.json();
+	const parsed = z.array(TaskResponseSchema).safeParse(data);
+	if (!parsed.success) {
+		throw new Error("データ形式が無効です");
+	}
+	return parsed.data;
+};
+
+const TaskList: React.FC<TaskListProps> = ({ initialTasks }) => {
+	const { data: tasks, error } = useSWR<TaskResponse[]>(
+		"http://localhost:3333/task",
+		fetcher,
+		{
+			fallbackData: initialTasks,
+		},
+	);
 
 	// RHFの初期化
 	const {
@@ -55,6 +52,10 @@ const TaskList: React.FC = () => {
 		resolver: zodResolver(NewTaskSchema),
 	});
 
+	// ローディングおよびエラーステートの処理
+	if (error) return <div>タスクの読み込みに失敗しました。</div>;
+	if (!tasks) return <div>読み込み中...</div>;
+
 	// フォーム送信時の処理
 	const onSubmit = (data: NewTask) => {
 		const newTaskItem: TaskResponse = {
@@ -65,21 +66,19 @@ const TaskList: React.FC = () => {
 			created_at: new Date().toISOString(),
 		};
 
-		setTasks((prevTasks) => [...prevTasks, newTaskItem]);
+		// swrキャッシュの再検証（最新を取得）
+		mutate("http://localhost:3333/task");
+
 		reset(); // フォームをリセット
 		alert(`追加したTodo: "${newTaskItem.title}"`);
 	};
 
 	const handleToggle = (id: number) => {
-		setTasks(
-			tasks.map((task) =>
-				task.id === id ? { ...task, is_completed: !task.is_completed } : task,
-			),
-		);
+		alert(id);
 	};
 
 	const handleDelete = (id: number) => {
-		setTasks(tasks.filter((task) => task.id !== id));
+		alert(id);
 	};
 
 	return (
