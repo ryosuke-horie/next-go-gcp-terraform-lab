@@ -57,7 +57,7 @@ const TaskList: React.FC<TaskListProps> = ({ initialTasks }) => {
 	if (!tasks) return <div>読み込み中...</div>;
 
 	// フォーム送信時の処理
-	const onSubmit = (data: NewTask) => {
+	const onSubmit = async (data: NewTask) => {
 		const newTaskItem: TaskResponse = {
 			id: Date.now(), // 一意のIDを生成
 			title: data.title.trim(),
@@ -66,38 +66,52 @@ const TaskList: React.FC<TaskListProps> = ({ initialTasks }) => {
 			created_at: new Date().toISOString(),
 		};
 
+		try {
+			const response = await fetch("http://localhost:3333/task", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify(newTaskItem),
+			});
+			if (!response.ok) {
+				const errorData: { message?: string } = await response.json();
+				throw new Error(errorData.message || "タスク追加に失敗しました");
+			}
+		} catch (error) {
+			alert("タスク作成に失敗しました");
+		}
+
 		// swrキャッシュの再検証（最新を取得）
 		mutate("http://localhost:3333/task");
-
 		reset(); // フォームをリセット
-		alert(`追加したTodo: "${newTaskItem.title}"`);
 	};
 
 	const handleToggle = (id: number) => {
 		alert(id);
 	};
 
-    const handleDelete = async (id: number) => {
-        try {
-            const response = await fetch("http://localhost:3333/task", {
+	const handleDelete = async (id: number) => {
+		try {
+			const response = await fetch("http://localhost:3333/task", {
 				method: "DELETE",
 				headers: {
-                    "Content-Type": "application/json",
+					"Content-Type": "application/json",
 				},
 				body: JSON.stringify({ id: id }),
 			});
 
-            if (!response.ok) {
-                const errorData: { message?: string } = await response.json();
-                throw new Error(errorData.message || "タスク削除に失敗しました")
-            }
+			if (!response.ok) {
+				const errorData: { message?: string } = await response.json();
+				throw new Error(errorData.message || "タスク削除に失敗しました");
+			}
 
-            // SWRのキャッシュを再検証
-            mutate("http://localhost:3333/task");
-        } catch (error){
-            console.error(error);
-            alert("失敗しました。")
-        }
+			// SWRのキャッシュを再検証
+			mutate("http://localhost:3333/task");
+		} catch (error) {
+			console.error(error);
+			alert("失敗しました。");
+		}
 	};
 
 	return (
