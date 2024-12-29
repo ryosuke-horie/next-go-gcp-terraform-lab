@@ -1,4 +1,23 @@
 services:
+  app:
+    build: 
+        context: .
+        target: dev
+        dockerfile: Dockerfile
+    environment:
+      PORT: 3333
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: password
+      DB_NAME: xodb
+    ports:
+      - "3333:3333"
+    volumes:
+      - .:/app
+      - /app/tmp
+    depends_on:
+      - db
   db:
     image: postgres:latest
     environment:
