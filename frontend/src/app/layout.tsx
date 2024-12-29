@@ -1,12 +1,9 @@
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import "./globals.css";
 import { ThemeProvider } from "@mui/material/styles";
+import type { Metadata } from "next";
 import { Roboto } from "next/font/google";
 import thema from "../thema";
-
-const inter = Inter({ subsets: ["latin"] });
+import "./globals.css";
 
 export const metadata: Metadata = {
 	title: "Create Next App",
