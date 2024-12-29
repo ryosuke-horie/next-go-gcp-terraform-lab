@@ -69,17 +69,6 @@ func (h *TaskHandler) CreateTaskHandler(w http.ResponseWriter, r *http.Request) 
 		CreatedAt:   task.CreatedAt,
 	}
 
-	// CORSヘッダーの設定
-	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
-	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
-
-	// プリフライトリクエストの処理
-	if r.Method == "OPTIONS" {
-		w.WriteHeader(http.StatusOK)
-		return
-	}
-
 	// 作成したタスクをレスポンスとして返す
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
@@ -107,17 +96,6 @@ func (h *TaskHandler) ListTaskHandler(w http.ResponseWriter, r *http.Request) {
 			CreatedAt:   task.CreatedAt,
 		}
 		responseTasks = append(responseTasks, responseTask)
-	}
-
-	// CORSヘッダーの設定
-	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
-	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
-
-	// プリフライトリクエストの処理
-	if r.Method == "OPTIONS" {
-		w.WriteHeader(http.StatusOK)
-		return
 	}
 
 	// レスポンスの設定と送信
@@ -150,17 +128,6 @@ func (h *TaskHandler) DeleteTaskHandler(w http.ResponseWriter, r *http.Request) 
 
 		log.Printf("タスクの削除に失敗しました。: %v", err)
 		http.Error(w, "タスクの削除に失敗しました。", http.StatusInternalServerError)
-		return
-	}
-
-	// CORSヘッダーの設定
-	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
-	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
-
-	// プリフライトリクエストの処理
-	if r.Method == "OPTIONS" {
-		w.WriteHeader(http.StatusOK)
 		return
 	}
 
