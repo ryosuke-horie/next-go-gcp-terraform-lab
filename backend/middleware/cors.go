@@ -10,7 +10,7 @@ func CORSMiddleware(next http.Handler) http.Handler {
 		// 必要に応じてオリジンを動的に設定
 		w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
 		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
 
 		// OPTIONSリクエストの場合、200を返して終了
 		if r.Method == http.MethodOptions {
