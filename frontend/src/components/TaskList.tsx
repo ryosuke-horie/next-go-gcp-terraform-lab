@@ -3,26 +3,38 @@
 import { Button, List, Paper, TextField } from "@mui/material";
 import type React from "react";
 import { useState } from "react";
-import type { TaskResponse } from "../types/Task";
+import { z } from "zod";
+import { type TaskResponse, TaskResponseSchema } from "../types/Task";
 import TaskItem from "./TaskItem";
 
+const initialTodos = [
+	{
+		id: 1,
+		title: "サンプルTODO 1",
+		detail: "詳細1",
+		is_completed: false,
+		created_at: new Date().toISOString(),
+	},
+	{
+		id: 2,
+		title: "サンプルTODO 2",
+		detail: "詳細2",
+		is_completed: true,
+		created_at: new Date().toISOString(),
+	},
+];
+
+// 検証
+const parsedTodos = z.array(TaskResponseSchema).safeParse(initialTodos);
+
+// zodによるバリデーション
+if (!parsedTodos.success) {
+	console.error("初期データが無効:", parsedTodos.error.format());
+	throw new Error("無効な初期データ");
+}
+
 const TaskList: React.FC = () => {
-	const [todos, setTodos] = useState<TaskResponse[]>([
-		{
-			id: 1,
-			title: "サンプルTODO 1",
-			detail: "詳細1",
-			is_completed: false,
-			created_at: new Date().toISOString(),
-		},
-		{
-			id: 2,
-			title: "サンプルTODO 2",
-			detail: "詳細2",
-			is_completed: true,
-			created_at: new Date().toISOString(),
-		},
-	]);
+	const [todos, setTodos] = useState<TaskResponse[]>(parsedTodos.data);
 	const [newTodo, setNewTodo] = useState<string>("");
 
 	const handleAddTodo = () => {

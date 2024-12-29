@@ -1,6 +1,6 @@
 "use client";
 
-import { Checkbox, IconButton, ListItem, ListItemText } from "@mui/material";
+import { Checkbox, ListItem, ListItemText } from "@mui/material";
 import Button from "@mui/material/Button";
 import type React from "react";
 import type { TaskResponse } from "../types/Task";
