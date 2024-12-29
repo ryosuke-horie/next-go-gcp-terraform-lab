@@ -77,8 +77,27 @@ const TaskList: React.FC<TaskListProps> = ({ initialTasks }) => {
 		alert(id);
 	};
 
-	const handleDelete = (id: number) => {
-		alert(id);
+    const handleDelete = async (id: number) => {
+        try {
+            const response = await fetch("http://localhost:3333/task", {
+				method: "DELETE",
+				headers: {
+                    "Content-Type": "application/json",
+				},
+				body: JSON.stringify({ id: id }),
+			});
+
+            if (!response.ok) {
+                const errorData: { message?: string } = await response.json();
+                throw new Error(errorData.message || "タスク削除に失敗しました")
+            }
+
+            // SWRのキャッシュを再検証
+            mutate("http://localhost:3333/task");
+        } catch (error){
+            console.error(error);
+            alert("失敗しました。")
+        }
 	};
 
 	return (
