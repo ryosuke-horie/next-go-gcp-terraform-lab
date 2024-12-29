@@ -1,9 +1,9 @@
-import Button from "@mui/material/Button";
+import TaskList from "@/components/TaskList";
 
 export default function Home() {
 	return (
 		<main>
-			<Button variant="contained">Hello MUI!!!</Button>
+			<TaskList />
 		</main>
 	);
 }
