@@ -1,7 +1,9 @@
+// app/src/components/TaskList.tsx
+
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Button, List, Paper, TextField } from "@mui/material";
+import { Button, List, Paper, Stack, TextField } from "@mui/material";
 import type React from "react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -56,9 +58,9 @@ const TaskList: React.FC = () => {
 	// フォーム送信時の処理
 	const onSubmit = (data: NewTask) => {
 		const newTaskItem: TaskResponse = {
-			id: 3, // 本来は＋1する
-			title: data.title,
-			detail: "", // 未実装のため空欄
+			id: Date.now(), // 一意のIDを生成
+			title: data.title.trim(),
+			detail: data.detail?.trim() || "",
 			is_completed: false,
 			created_at: new Date().toISOString(),
 		};
@@ -83,27 +85,38 @@ const TaskList: React.FC = () => {
 	return (
 		<Paper style={{ padding: 16, maxWidth: 600, margin: "auto" }}>
 			<h1>TODOリスト</h1>
-			<form
-				onSubmit={handleSubmit(onSubmit)}
-				style={{ display: "flex", marginBottom: 16 }}
-			>
-				<TextField
-					label="新しいTODO"
-					variant="outlined"
-					fullWidth
-					{...register("title")}
-					error={!!errors.title}
-					helperText={errors.title ? errors.title.message : ""}
-				/>
-				<Button
-					type="submit"
-					variant="contained"
-					color="primary"
-					style={{ marginLeft: 8 }}
-					disabled={isSubmitting}
-				>
-					追加
-				</Button>
+			<form onSubmit={handleSubmit(onSubmit)}>
+				<Stack spacing={2} marginBottom={2}>
+					{/* タイトル入力フィールド */}
+					<TextField
+						label="新しいTODO"
+						variant="outlined"
+						fullWidth
+						{...register("title")}
+						error={!!errors.title}
+						helperText={errors.title ? errors.title.message : ""}
+					/>
+					{/* 詳細入力フィールド（テキストエリア） */}
+					<TextField
+						label="詳細"
+						variant="outlined"
+						fullWidth
+						multiline
+						rows={4}
+						{...register("detail")}
+						error={!!errors.detail}
+						helperText={errors.detail ? errors.detail.message : ""}
+					/>
+					{/* 追加ボタン */}
+					<Button
+						type="submit"
+						variant="contained"
+						color="primary"
+						disabled={isSubmitting}
+					>
+						追加
+					</Button>
+				</Stack>
 			</form>
 			<List>
 				{tasks.map((task) => (

@@ -12,6 +12,7 @@ export const TaskResponseSchema = z.object({
 // フォーム用のスキーマ
 export const NewTaskSchema = z.object({
 	title: z.string().min(1, "TODOアイテムを入力してください。"),
+	detail: z.string().optional(),
 });
 
 // 型定義をスキーマから生成
