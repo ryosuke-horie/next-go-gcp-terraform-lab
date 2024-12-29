@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"log"
 
 	"github.com/ryosuke-horie/next-go-gcp-terraform-k8s-lab/models"
@@ -51,6 +52,13 @@ func (r *TaskRepositoryImpl) ListTasks(ctx context.Context) ([]models.Task, erro
 
 // 指定したIDのタスクをDBから削除
 func (r *TaskRepositoryImpl) DeleteTask(ctx context.Context, id int) error {
-	task := models.Task{ID: id}
+	// タスクを取得して存在確認
+	task, err := models.TaskByID(ctx, r.DB, id)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return fmt.Errorf("タスクが見つかりません")
+		}
+	}
+
 	return task.Delete(ctx, r.DB)
 }

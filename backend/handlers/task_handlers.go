@@ -4,6 +4,7 @@ package handlers
 import (
 	"database/sql"
 	"encoding/json"
+	"errors"
 	"log"
 	"net/http"
 	"time"
@@ -119,7 +120,7 @@ func (h *TaskHandler) ListTaskHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	/// レスポンスの設定と送信
+	// レスポンスの設定と送信
 	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(responseTasks); err != nil {
 		log.Printf("レスポンスのエンコードに失敗しました。: %v", err)
@@ -128,7 +129,9 @@ func (h *TaskHandler) ListTaskHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// タスク削除処理
 func (h *TaskHandler) DeleteTaskHandler(w http.ResponseWriter, r *http.Request) {
+	// idを受け取り該当のタスクを削除する
 	var input struct {
 		ID int `json:"id"`
 	}
@@ -141,6 +144,10 @@ func (h *TaskHandler) DeleteTaskHandler(w http.ResponseWriter, r *http.Request) 
 
 	// タスクを削除
 	if err := h.Repo.DeleteTask(r.Context(), input.ID); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			http.Error(w, "タスクが見つかりません", http.StatusNotFound)
+		}
+
 		log.Printf("タスクの削除に失敗しました。: %v", err)
 		http.Error(w, "タスクの削除に失敗しました。", http.StatusInternalServerError)
 		return
