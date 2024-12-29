@@ -1,10 +1,17 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, List, Paper, TextField } from "@mui/material";
 import type React from "react";
 import { useState } from "react";
+import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { type TaskResponse, TaskResponseSchema } from "../types/Task";
+import {
+	type NewTask,
+	NewTaskSchema,
+	type TaskResponse,
+	TaskResponseSchema,
+} from "../types/Task";
 import TaskItem from "./TaskItem";
 
 const initialTasks = [
@@ -35,25 +42,30 @@ if (!parsedTasks.success) {
 
 const TaskList: React.FC = () => {
 	const [tasks, setTasks] = useState<TaskResponse[]>(parsedTasks.data);
-	const [newTask, setNewTask] = useState<string>("");
 
-	const handleAddTask = () => {
-		if (newTask.trim() === "") {
-			alert("TODOアイテムを入力してください。");
-			return;
-		}
+	// RHFの初期化
+	const {
+		register,
+		handleSubmit,
+		reset,
+		formState: { errors, isSubmitting },
+	} = useForm<NewTask>({
+		resolver: zodResolver(NewTaskSchema),
+	});
 
+	// フォーム送信時の処理
+	const onSubmit = (data: NewTask) => {
 		const newTaskItem: TaskResponse = {
-			id: Date.now(),
-			title: newTask.trim(),
-			detail: "",
+			id: 3, // 本来は＋1する
+			title: data.title,
+			detail: "", // 未実装のため空欄
 			is_completed: false,
 			created_at: new Date().toISOString(),
 		};
 
-		setTasks([...tasks, newTaskItem]);
-		setNewTask("");
-		alert(`追加したTODO: "${newTaskItem.title}"`);
+		setTasks((prevTasks) => [...prevTasks, newTaskItem]);
+		reset(); // フォームをリセット
+		alert(`追加したTodo: "${newTaskItem.title}"`);
 	};
 
 	const handleToggle = (id: number) => {
@@ -71,23 +83,28 @@ const TaskList: React.FC = () => {
 	return (
 		<Paper style={{ padding: 16, maxWidth: 600, margin: "auto" }}>
 			<h1>TODOリスト</h1>
-			<div style={{ display: "flex", marginBottom: 16 }}>
+			<form
+				onSubmit={handleSubmit(onSubmit)}
+				style={{ display: "flex", marginBottom: 16 }}
+			>
 				<TextField
 					label="新しいTODO"
 					variant="outlined"
 					fullWidth
-					value={newTask}
-					onChange={(e) => setNewTask(e.target.value)}
+					{...register("title")}
+					error={!!errors.title}
+					helperText={errors.title ? errors.title.message : ""}
 				/>
 				<Button
+					type="submit"
 					variant="contained"
 					color="primary"
 					style={{ marginLeft: 8 }}
-					onClick={handleAddTask}
+					disabled={isSubmitting}
 				>
 					追加
 				</Button>
-			</div>
+			</form>
 			<List>
 				{tasks.map((task) => (
 					<TaskItem
