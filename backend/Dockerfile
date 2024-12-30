@@ -17,6 +17,8 @@ RUN apt-get update
 
 COPY --from=deploy-builder /app/app .
 
+EXPOSE 8080
+
 CMD ["./app"]
 
 # ---------------------------------------------------
