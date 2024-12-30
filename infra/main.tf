@@ -20,6 +20,10 @@ resource "google_project_service" "cloud_resource_manager_api" {
   disable_on_destroy = false
 }
 
+# 
+# Arifact Registry
+# 
+
 # Artifact Registry Repositoryの作成
 resource "google_artifact_registry_repository" "task-api-golang-repo" {
   location      = var.default_region
@@ -51,4 +55,30 @@ resource "google_project_iam_member" "artifact_registry_admin" {
   depends_on = [
     google_project_service.cloud_resource_manager_api
   ]
+}
+
+# 
+# CloudSQL
+# 
+
+resource "google_sql_database_instance" "next-go-gcp-terraform-k8s-lab-db-instance" {
+  name             = "next-go-gcp-terraform-k8s-lab-db-instance"
+  database_version = "POSTGRES_17"
+  settings {
+    edition = "ENTERPRISE" # v16以降は明示的に指定する
+    tier    = "db-f1-micro"
+  }
+
+  deletion_protection = "true"
+}
+
+resource "google_sql_database" "next-go-gcp-terraform-k8s-lab-db" {
+  name     = "next-go-gcp-terraform-k8s-lab-db"
+  instance = google_sql_database_instance.next-go-gcp-terraform-k8s-lab-db-instance.name
+}
+
+resource "google_sql_user" "sql-user" {
+  name     = "sql-user"
+  instance = google_sql_database_instance.next-go-gcp-terraform-k8s-lab-db-instance.name
+  password = var.db_password
 }
