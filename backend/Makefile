@@ -7,7 +7,10 @@ build: ## Build docker image to deploy
 		--target deploy ./
 
 push: ## push docker image to artifact registry
-	docker push asia-southeast1-docker.pkg.dev/plasma-renderer-446307-u5/task-api-golang-repo/gotodo:latest
+	docker buildx build --platform linux/amd64 \
+  --target deploy \
+  -t asia-southeast1-docker.pkg.dev/plasma-renderer-446307-u5/task-api-golang-repo/gotodo:latest \
+  --push .
 
 auth-repo: ## authorize artifact registry
 	gcloud auth configure-docker asia-southeast1-docker.pkg.dev
