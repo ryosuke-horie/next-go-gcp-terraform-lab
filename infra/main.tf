@@ -162,3 +162,17 @@ resource "google_project_iam_member" "cloud_run_cloudsql_client" {
     google_project_service.cloud_resource_manager_api
   ]
 }
+
+# Cloud Run サービスへのパブリックアクセスを許可
+resource "google_cloud_run_service_iam_member" "allow_public" {
+  project  = var.project_id
+  location = google_cloud_run_v2_service.default.location
+  service  = google_cloud_run_v2_service.default.name
+
+  role   = "roles/run.invoker"
+  member = "allUsers"
+
+  depends_on = [
+    google_cloud_run_v2_service.default
+  ]
+}
