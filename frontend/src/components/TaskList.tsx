@@ -5,12 +5,11 @@ import { Button, List, Paper, Stack, TextField } from "@mui/material";
 import type React from "react";
 import { useForm } from "react-hook-form";
 import useSWR, { mutate } from "swr";
-import { z } from "zod";
 import {
 	type NewTask,
 	NewTaskSchema,
+	TaskListResponseSchema,
 	type TaskResponse,
-	TaskResponseSchema,
 } from "../types/Task";
 import TaskItem from "./TaskItem";
 
@@ -26,11 +25,19 @@ const fetcher = async (url: string): Promise<TaskResponse[]> => {
 	}
 
 	const data = await response.json();
-	const parsed = z.array(TaskResponseSchema).safeParse(data);
+
+	// nullの場合は空配列を返す
+	if (data === null) {
+		return [];
+	}
+
+	const parsed = TaskListResponseSchema.safeParse(data);
 	if (!parsed.success) {
 		throw new Error("データ形式が無効です");
 	}
-	return parsed.data;
+
+	// nullの場合は空配列を設定
+	return parsed.data ?? [];
 };
 
 const TaskList: React.FC<TaskListProps> = ({ initialTasks }) => {

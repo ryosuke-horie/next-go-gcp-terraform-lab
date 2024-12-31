@@ -9,6 +9,9 @@ export const TaskResponseSchema = z.object({
 	created_at: z.string().datetime(), // ISO形式の日時文字列
 });
 
+// タスクリスト全体のスキーマ（配列またはnull）
+export const TaskListResponseSchema = z.array(TaskResponseSchema).nullable();
+
 // フォーム用のスキーマ
 export const NewTaskSchema = z.object({
 	title: z.string().min(1, "TODOアイテムを入力してください。"),

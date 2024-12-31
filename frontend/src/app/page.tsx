@@ -1,7 +1,6 @@
 import TaskList from "@/components/TaskList";
-import { getCloudflareContext } from "@opennextjs/cloudflare"; // インポートを追加
-import { z } from "zod";
-import { type TaskResponse, TaskResponseSchema } from "../types/Task";
+import { getCloudflareContext } from "@opennextjs/cloudflare";
+import { TaskListResponseSchema, type TaskResponse } from "../types/Task";
 
 const Home = async () => {
 	try {
@@ -25,15 +24,16 @@ const Home = async () => {
 
 		const data = await response.json();
 
-		// Zodによるデータ検証
-		const parsed = z.array(TaskResponseSchema).safeParse(data);
+		// Zodによるデータ検証（nullを許容）
+		const parsed = TaskListResponseSchema.safeParse(data);
 
 		if (!parsed.success) {
 			console.error("取得したデータが無効です:", parsed.error.format());
 			throw new Error("取得したデータの形式が無効です。");
 		}
 
-		const tasks: TaskResponse[] = parsed.data;
+		// nullの場合は空配列を設定
+		const tasks: TaskResponse[] = parsed.data ?? [];
 
 		return (
 			<main>
