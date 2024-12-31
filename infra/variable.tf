@@ -9,6 +9,12 @@ variable "default_region" {
   default     = "asia-southeast1"
 }
 
+variable "db_name" {
+  description = "データベースの名前"
+  type        = string
+  default     = "xodb"
+}
+
 variable "db_password" {
   description = "Databaseのパスワード"
   type        = string

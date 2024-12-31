@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 )
 
 // DB初期化処理
@@ -16,9 +17,14 @@ func initDB() (*sql.DB, error) {
 	dbHost := getEnv("DB_HOST", "localhost")
 	dbPort := getEnv("DB_PORT", "5432")
 
-	// DB接続文字列作成
-	connStr := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable", dbUser, dbPassword, dbHost, dbPort, dbName)
-
+	var connStr string
+	if strings.HasPrefix(dbHost, "/") {
+		// Unixソケットを使用する場合
+		connStr = fmt.Sprintf("postgres://%s:%s@/%s?host=%s&sslmode=disable", dbUser, dbPassword, dbName, dbHost)
+	} else {
+		// TCP接続を使用する場合
+		connStr = fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable", dbUser, dbPassword, dbHost, dbPort, dbName)
+	}
 	// DB接続
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
