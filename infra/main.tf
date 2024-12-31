@@ -4,6 +4,14 @@ provider "google" {
   region      = var.default_region
 }
 
+terraform {
+  backend "gcs" {
+    bucket      = "gs-state-terraform-plasma-renderer-446307-u5"
+    prefix      = "terraform/state"
+    credentials = "key.json"
+  }
+}
+
 # Artifact Registry APIを有効化
 resource "google_project_service" "artifact_registry_api" {
   project = var.project_id
