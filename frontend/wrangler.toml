@@ -7,3 +7,10 @@ compatibility_flags = ["nodejs_compat"]
 
 # Assets used for files and cache priming.
 assets = { directory = ".open-next/assets", binding = "ASSETS" }
+
+[vars]
+NEXT_PUBLIC_API_BASE_URL = "https://cloudrun-service-191083186598.asia-southeast1.run.app"
+
+[observability]
+enabled = true
+head_sampling_rate = 1 

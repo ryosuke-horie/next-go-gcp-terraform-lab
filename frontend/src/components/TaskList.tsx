@@ -34,8 +34,15 @@ const fetcher = async (url: string): Promise<TaskResponse[]> => {
 };
 
 const TaskList: React.FC<TaskListProps> = ({ initialTasks }) => {
+	// 環境変数からAPIのベースURLを取得
+	const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+
+	if (!apiBaseUrl) {
+		throw new Error("NEXT_PUBLIC_API_BASE_URLが設定されていません。");
+	}
+
 	const { data: tasks, error } = useSWR<TaskResponse[]>(
-		"http://localhost:3333/task",
+		`${apiBaseUrl}/task`,
 		fetcher,
 		{
 			fallbackData: initialTasks,
@@ -67,7 +74,7 @@ const TaskList: React.FC<TaskListProps> = ({ initialTasks }) => {
 		};
 
 		try {
-			const response = await fetch("http://localhost:3333/task", {
+			const response = await fetch(`${apiBaseUrl}/task`, {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
@@ -83,7 +90,7 @@ const TaskList: React.FC<TaskListProps> = ({ initialTasks }) => {
 		}
 
 		// swrキャッシュの再検証（最新を取得）
-		mutate("http://localhost:3333/task");
+		mutate(`${apiBaseUrl}/task`);
 		reset(); // フォームをリセット
 	};
 
@@ -93,7 +100,7 @@ const TaskList: React.FC<TaskListProps> = ({ initialTasks }) => {
 
 	const handleDelete = async (id: number) => {
 		try {
-			const response = await fetch("http://localhost:3333/task", {
+			const response = await fetch(`${apiBaseUrl}/task`, {
 				method: "DELETE",
 				headers: {
 					"Content-Type": "application/json",
@@ -107,7 +114,7 @@ const TaskList: React.FC<TaskListProps> = ({ initialTasks }) => {
 			}
 
 			// SWRのキャッシュを再検証
-			mutate("http://localhost:3333/task");
+			mutate(`${apiBaseUrl}/task`);
 		} catch (error) {
 			console.error(error);
 			alert("失敗しました。");
