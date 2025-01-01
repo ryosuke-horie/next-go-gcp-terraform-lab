@@ -8,6 +8,11 @@ resource "google_project_service" "iamcredentials" {
   service = "iamcredentials.googleapis.com"
   project = var.project_id
 
+  # Terraform destroy 時や disable_on_destroy = true の際に、
+  # 依存しているサービスもまとめて disable する
+  disable_on_destroy         = true
+  disable_dependent_services = true
+
   depends_on = [google_project_service.iam_api]
 }
 
