@@ -5,9 +5,8 @@ provider "google" {
 
 terraform {
   backend "gcs" {
-    bucket      = "gs-state-terraform-plasma-renderer-446307-u5"
-    prefix      = "terraform/state"
-    credentials = var.use_key_file ? file("key.json") : null
+    bucket = "gs-state-terraform-plasma-renderer-446307-u5"
+    prefix = "terraform/state"
   }
 }
 

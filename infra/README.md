@@ -3,9 +3,7 @@
 ## ローカルで利用するコマンド
 
 ```bash
-terraform init \
-  -backend-config="credentials=key.json"
-
+terraform init
 terraform apply 
 
 # applyの前後でADCがないなら
