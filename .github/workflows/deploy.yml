@@ -10,8 +10,8 @@ permissions:
   statuses: write
 
 env:
-    PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
-    TF_VAR_db_password: ${{ secrets.DB_PASSWORD }}
+  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  TF_VAR_db_password: ${{ secrets.DB_PASSWORD }}
 
 jobs:
   deploy:
@@ -24,7 +24,7 @@ jobs:
       - name: Authenticate to GCP
         uses: google-github-actions/auth@v2
         with:
-          workload_identity_provider: "//iam.googleapis.com/projects/191083186598/locations/global/workloadIdentityPools/github-actions-pool/providers/github-actions-provider"
+          workload_identity_provider: "projects/191083186598/locations/global/workloadIdentityPools/github-actions-pool/providers/github-actions-provider"
           service_account: "github-actions@${{ secrets.GCP_PROJECT_ID }}.iam.gserviceaccount.com"
 
       - name: Setup Terraform
@@ -39,7 +39,7 @@ jobs:
           terraform plan \
             -var="project_id=${{ env.PROJECT_ID }}" \
             -var="db_password=${{ env.TF_VAR_db_password }}" \
-            -var="use_key_file"=false
+            -var="use_key_file=false" \
             -out=plan.out
 
       - name: Terraform Apply
