@@ -4,6 +4,12 @@ variable "project_id" {
   default     = "plasma-renderer-446307-u5"
 }
 
+variable "use_key_file" {
+  description = "key.jsonを利用するかどうか"
+  type        = bool
+  default     = true
+}
+
 variable "default_region" {
   description = "The default region for resources"
   default     = "asia-southeast1"

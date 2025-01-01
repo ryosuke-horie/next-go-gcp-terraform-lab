@@ -2,14 +2,11 @@
 .DEFAULT_GOAL := help
 
 DOCKER_TAG := latest
-build: ## Build docker image to deploy
-	docker build -t asia-southeast1-docker.pkg.dev/plasma-renderer-446307-u5/task-api-golang-repo/gotodo:latest \
-		--target deploy ./
 
 push: ## push docker image to artifact registry
 	docker buildx build --platform linux/amd64 \
   --target deploy \
-  -t asia-southeast1-docker.pkg.dev/plasma-renderer-446307-u5/task-api-golang-repo/gotodo:latest \
+  -t asia-southeast1-docker.pkg.dev/plasma-renderer-446307-u5/task-api-repositry/gotodo:latest \
   --push .
 
 auth-repo: ## authorize artifact registry

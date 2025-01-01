@@ -1,15 +1,30 @@
 provider "google" {
-  credentials = file("key.json")
-  project     = var.project_id
-  region      = var.default_region
+  project = var.project_id
+  region  = var.default_region
 }
 
 terraform {
   backend "gcs" {
     bucket      = "gs-state-terraform-plasma-renderer-446307-u5"
     prefix      = "terraform/state"
-    credentials = "key.json"
+    credentials = var.use_key_file ? file("key.json") : null
   }
+}
+
+# GitHub Actions用のIAMモジュールを呼び出す
+module "github_actions_iam" {
+  source                             = "./modules/github_actions_iam"
+  project_id                         = var.project_id
+  account_id                         = "github-actions"
+  workload_identity_pool_id          = "github-actions-pool"
+  workload_identity_pool_provider_id = "github-actions-provider"
+}
+
+# モジュールの出力を使用する :github-actions@plasma-renderer-446307-u5.iam.gserviceaccount.com
+resource "google_project_iam_member" "github_actions_storage_object_viewer" {
+  project = var.project_id
+  role    = "roles/storage.objectViewer"
+  member  = "serviceAccount:${module.github_actions_iam.service_account_email}"
 }
 
 # Artifact Registry APIを有効化
@@ -26,32 +41,6 @@ resource "google_project_service" "cloud_resource_manager_api" {
   service = "cloudresourcemanager.googleapis.com"
 
   disable_on_destroy = false
-}
-
-# 
-# Arifact Registry
-# 
-
-# Artifact Registry Repositoryの作成
-resource "google_artifact_registry_repository" "task-api-golang-repo" {
-  location      = var.default_region
-  repository_id = "task-api-golang-repo"
-  description   = "タスク管理アプリケーションのGolang製APIイメージ格納用レジストリ"
-  format        = "docker"
-  #   kms_key_name           = "KEY"
-  cleanup_policy_dry_run = false # クリーンアップポリシーを適用する
-  cleanup_policies {
-    id     = "delete-old-images"
-    action = "DELETE"
-    condition {
-      older_than = "2592000s" # 30日を秒に換算
-    }
-  }
-
-  depends_on = [
-    google_project_service.artifact_registry_api,
-    google_project_service.cloud_resource_manager_api
-  ]
 }
 
 # IAMポリシーの設定
@@ -113,7 +102,7 @@ resource "google_cloud_run_v2_service" "default" {
     }
 
     containers {
-      image = "asia-southeast1-docker.pkg.dev/plasma-renderer-446307-u5/task-api-golang-repo/gotodo:latest"
+      image = "asia-southeast1-docker.pkg.dev/plasma-renderer-446307-u5/task-api-repositry/gotodo:latest"
 
       resources {
         limits = {
