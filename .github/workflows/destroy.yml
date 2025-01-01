@@ -2,6 +2,8 @@ name: destroy
 
 on:
   workflow_dispatch:
+  schedule:
+    - cron: '30 16 * * *' # 日本時間午前1時30分
 
 permissions:
   id-token: write
