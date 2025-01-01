@@ -12,6 +12,22 @@ terraform {
   }
 }
 
+# GitHub Actions用のIAMモジュールを呼び出す
+module "github_actions_iam" {
+  source                             = "./modules/github_actions_iam"
+  project_id                         = var.project_id
+  account_id                         = "github-actions"
+  workload_identity_pool_id          = "github-actions-pool"
+  workload_identity_pool_provider_id = "github-actions-provider"
+}
+
+# モジュールの出力を使用する :github-actions@plasma-renderer-446307-u5.iam.gserviceaccount.com
+resource "google_project_iam_member" "github_actions_storage_object_viewer" {
+  project = var.project_id
+  role    = "roles/storage.objectViewer"
+  member  = "serviceAccount:${module.github_actions_iam.service_account_email}"
+}
+
 # Artifact Registry APIを有効化
 resource "google_project_service" "artifact_registry_api" {
   project = var.project_id
