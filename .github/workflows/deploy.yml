@@ -1,0 +1,47 @@
+name: deploy
+
+on:
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+  pull-requests: write
+  statuses: write
+
+env:
+    PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+    TF_VAR_db_password: ${{ secrets.DB_PASSWORD }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Authenticate to GCP
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: "projects/191083186598/locations/global/workloadIdentityPools/github-actions-pool"
+          service_account: "github-actions@${{ secrets.GCP_PROJECT_ID }}.iam.gserviceaccount.com"
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init
+        run: |
+          terraform init 
+
+      - name: Terraform Plan
+        run: |
+          terraform plan \
+            -var="project_id=${{ env.PROJECT_ID }}" \
+            -var="db_password=${{ env.TF_VAR_db_password }}" \
+            -var="use_key_file"=false
+            -out=plan.out
+
+      - name: Terraform Apply
+        run: |
+          terraform apply -auto-approve plan.out

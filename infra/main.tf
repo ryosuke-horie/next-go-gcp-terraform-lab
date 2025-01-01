@@ -1,5 +1,5 @@
 provider "google" {
-  credentials = file("key.json")
+  credentials = var.use_key_file ? file("key.json") : null
   project     = var.project_id
   region      = var.default_region
 }
@@ -8,7 +8,7 @@ terraform {
   backend "gcs" {
     bucket      = "gs-state-terraform-plasma-renderer-446307-u5"
     prefix      = "terraform/state"
-    credentials = "key.json"
+    credentials = var.use_key_file ? file("key.json") : null
   }
 }
 
