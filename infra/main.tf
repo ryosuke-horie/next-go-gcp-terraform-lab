@@ -1,7 +1,6 @@
 provider "google" {
-  credentials = var.use_key_file ? file("key.json") : null
-  project     = var.project_id
-  region      = var.default_region
+  project = var.project_id
+  region  = var.default_region
 }
 
 terraform {
