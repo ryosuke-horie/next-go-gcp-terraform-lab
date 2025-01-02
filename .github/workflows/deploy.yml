@@ -15,6 +15,9 @@ permissions:
 env:
   PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
   TF_VAR_db_password: ${{ secrets.DB_PASSWORD }}
+  DB_INSTANCE_NAME:  next-go-gcp-terraform-k8s-lab-db-instance
+  DB_USER: sql-user 
+  DB_NAME: next-go-gcp-terraform-k8s-lab-db	 
 
 jobs:
   deploy:
@@ -63,3 +66,23 @@ jobs:
         run: |
           terraform apply -auto-approve plan.out
         working-directory: infra
+
+      - name: Download Cloud SQL Auth Proxy
+        run: |
+          curl -o cloud_sql_proxy https://dl.google.com/cloudsql/cloud_sql_proxy.linux.amd64
+          chmod +x cloud_sql_proxy
+
+      - name: Start Cloud SQL Proxy
+        run: |
+          ./cloud_sql_proxy -instances=${{ env.PROJECT_ID }}:asia-southeast1:${{ env.DB_INSTANCE_NAME }}=tcp:5432 &
+        env:
+          DB_REGION: asia-southeast1
+
+      - name: Apply SQL file to PostgreSQL
+        run: |
+          PGPASSWORD=${{ env.TF_VAR_db_password }} psql \
+            -h 127.0.0.1 \
+            -p 5432 \
+            -U ${{ env.DB_USER }} \
+            -d ${{ env.DB_NAME }} \
+            -f ./backend/sql/create-tasks-table.sql
