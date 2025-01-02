@@ -8,12 +8,12 @@ import "./globals.css";
 export const metadata: Metadata = {
 	title: "検証用タスク管理アプリケーション",
 	description: "検証用タスク管理アプリケーション",
-    robots: {
-        index: false,
-        googleBot: {
-            index: false
-        }
-    }
+	robots: {
+		index: false,
+		googleBot: {
+			index: false,
+		},
+	},
 };
 
 const roboto = Roboto({
