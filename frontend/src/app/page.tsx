@@ -1,5 +1,5 @@
 import TaskList from "@/components/TaskList";
-import { getCloudflareContext } from "@opennextjs/cloudflare"; // インポートを追加
+import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { z } from "zod";
 import { type TaskResponse, TaskResponseSchema } from "../types/Task";
 
@@ -8,6 +8,7 @@ const Home = async () => {
 		// Cloudflare Workersのコンテキストから環境変数を取得
 		const { env } = await getCloudflareContext();
 		const apiBaseUrl = env.NEXT_PUBLIC_API_BASE_URL;
+        console.log(apiBaseUrl)
 
 		if (!apiBaseUrl) {
 			throw new Error("NEXT_PUBLIC_API_BASE_URLが設定されていません。");
