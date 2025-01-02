@@ -1,10 +1,13 @@
-name: deploy
+name: deploy backend
 
 on:
   workflow_dispatch:
   push:
     branches:
       - main
+    paths:
+      - 'infra/**'
+      - 'backend/**'
 
 permissions:
   id-token: write
@@ -20,7 +23,7 @@ env:
   DB_NAME: next-go-gcp-terraform-k8s-lab-db	 
 
 jobs:
-  deploy:
+  deploy_backend:
     runs-on: ubuntu-latest
 
     steps:
