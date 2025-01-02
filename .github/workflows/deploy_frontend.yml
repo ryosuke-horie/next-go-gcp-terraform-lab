@@ -17,8 +17,8 @@ jobs:
         with: 
             node-version: "22"
 
-      - name: Build
-        run: npm run build
+      - name: Install dependencies and Build
+        run: npm ci && npm run build
         working-directory: frontend
 
       - name: Deploy
