@@ -18,7 +18,7 @@ jobs:
             node-version: "22"
 
       - name: Install dependencies and Build
-        run: npm ci && opennextjs-cloudflare && npm run build
+        run: npm ci && npx opennextjs-cloudflare && npm run build
         working-directory: frontend
 
       - name: Deploy
