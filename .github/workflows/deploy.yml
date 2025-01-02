@@ -30,6 +30,10 @@ jobs:
           workload_identity_provider: "projects/191083186598/locations/global/workloadIdentityPools/github-pool/providers/github-provider"
           service_account: "terraform@${{ secrets.GCP_PROJECT_ID }}.iam.gserviceaccount.com"
 
+      - name: Configure Docker to use gcloud as a credential
+        run: |
+          gcloud auth configure-docker asia-southeast1-docker.pkg.dev
+
       - name: Docker Build&Push
         run: |
             docker buildx build --platform linux/amd64 \
