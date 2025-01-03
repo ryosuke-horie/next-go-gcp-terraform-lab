@@ -1,0 +1,65 @@
+name: Notify Slack on All Job Failures
+
+on:
+  workflow_run:
+    workflows: "**"
+    types:
+      - completed
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'failure' }}
+    steps:
+      - name: Collect Failed Jobs Information
+        id: collect
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const workflowRunId = context.payload.workflow_run.id;
+            const { data: jobs } = await github.actions.listJobsForWorkflowRun({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: workflowRunId,
+            });
+
+            const failedJobs = jobs.jobs.filter(job => job.conclusion === 'failure');
+
+            const failedJobsInfo = failedJobs.map(job => ({
+              name: job.name,
+              url: job.html_url
+            }));
+
+            return failedJobsInfo;
+
+      - name: Send Slack Notification
+        uses: slackapi/slack-github-action@v1.23.0
+        with:
+          payload: |
+            {
+              "text": "⚠️ *すべてのジョブが失敗しました*",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*以下のジョブが失敗しました:*"
+                  }
+                },
+                {
+                  "type": "section",
+                  "fields": [
+                    ${{
+                      toJson(steps.collect.outputs.result).split(',').map(job => `
+                      {
+                        "type": "mrkdwn",
+                        "text": "*${job.name}*\n${job.url}"
+                      }
+                      `).join(',')
+                    }}
+                  ]
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
