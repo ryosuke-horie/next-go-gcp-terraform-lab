@@ -5,13 +5,13 @@ import Button from "@mui/material/Button";
 import type React from "react";
 import type { TaskResponse } from "../types/Task";
 
-interface TodoItemProps {
+interface TaskItemProps {
 	task: TaskResponse;
 	onToggle: (id: number) => void;
 	onDelete: (id: number) => void;
 }
 
-const TodoItem: React.FC<TodoItemProps> = ({ task, onToggle, onDelete }) => {
+const TaskItem: React.FC<TaskItemProps> = ({ task, onToggle, onDelete }) => {
 	const handleToggle = () => {
 		onToggle(task.id);
 	};
@@ -44,4 +44,4 @@ const TodoItem: React.FC<TodoItemProps> = ({ task, onToggle, onDelete }) => {
 	);
 };
 
-export default TodoItem;
+export default TaskItem;

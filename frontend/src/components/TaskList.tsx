@@ -12,7 +12,7 @@ import {
 	type TaskResponse,
 	TaskResponseSchema,
 } from "../types/Task";
-import TaskItem from "./TaskItem";
+import TaskItem from "./TaskItem"; // 修正後のコンポーネント名
 
 interface TaskListProps {
 	initialTasks: TaskResponse[];
@@ -85,8 +85,9 @@ const TaskList: React.FC<TaskListProps> = ({ initialTasks }) => {
 				const errorData: { message?: string } = await response.json();
 				throw new Error(errorData.message || "タスク追加に失敗しました");
 			}
-		} catch (error) {
-			alert("タスク作成に失敗しました");
+		} catch (error: any) {
+			// エラーメッセージを取得するため any に
+			alert(error.message || "タスク作成に失敗しました");
 		}
 
 		// swrキャッシュの再検証（最新を取得）
@@ -107,6 +108,8 @@ const TaskList: React.FC<TaskListProps> = ({ initialTasks }) => {
 				is_completed: !task.is_completed,
 			};
 
+			console.log("Updating task:", updatedTask);
+
 			const response = await fetch(`${apiBaseUrl}/task`, {
 				method: "PUT",
 				headers: {
@@ -115,6 +118,8 @@ const TaskList: React.FC<TaskListProps> = ({ initialTasks }) => {
 				body: JSON.stringify(updatedTask),
 			});
 
+			console.log("Response status:", response.status);
+
 			if (!response.ok) {
 				const errorData: { message?: string } = await response.json();
 				throw new Error(errorData.message || "タスクの更新に失敗しました");
@@ -122,9 +127,10 @@ const TaskList: React.FC<TaskListProps> = ({ initialTasks }) => {
 
 			// SWRのキャッシュを再検証
 			mutate(`${apiBaseUrl}/task`);
-		} catch (error) {
-			console.error(error);
-			alert("タスクの更新に失敗しました");
+		} catch (error: any) {
+			// エラーメッセージを取得するため any に
+			console.error("Error updating task:", error);
+			alert(error.message || "タスクの更新に失敗しました");
 		}
 	};
 
@@ -145,9 +151,10 @@ const TaskList: React.FC<TaskListProps> = ({ initialTasks }) => {
 
 			// SWRのキャッシュを再検証
 			mutate(`${apiBaseUrl}/task`);
-		} catch (error) {
+		} catch (error: any) {
+			// エラーメッセージを取得するため any に
 			console.error(error);
-			alert("失敗しました。");
+			alert(error.message || "失敗しました。");
 		}
 	};
 
