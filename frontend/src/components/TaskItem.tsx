@@ -14,12 +14,10 @@ interface TodoItemProps {
 const TodoItem: React.FC<TodoItemProps> = ({ task, onToggle, onDelete }) => {
 	const handleToggle = () => {
 		onToggle(task.id);
-		alert(`Toggled TODO with id: ${task.id}`);
 	};
 
 	const handleDelete = () => {
 		onDelete(task.id);
-		alert(`Deleted TODO with id: ${task.id}`);
 	};
 
 	return (
