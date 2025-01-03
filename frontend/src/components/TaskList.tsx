@@ -94,31 +94,38 @@ const TaskList: React.FC<TaskListProps> = ({ initialTasks }) => {
 		reset(); // フォームをリセット
 	};
 
-    // 更新処理
-	const handleToggle = (id: number) => {
-        try {
-            const task = tasks.find((task) => task.id === id);
-            if (!task) {
-                throw new Error("タスクが見つかりません");
-            }
+	// 更新処理
+	const handleToggle = async (id: number) => {
+		try {
+			const task = tasks.find((task) => task.id === id);
+			if (!task) {
+				throw new Error("タスクが見つかりません");
+			}
 
-            const updatedTask = { ...task, is_completed: !task.is_completed };
-            fetch(`${apiBaseUrl}/task`, {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(updatedTask),
-            }).then((response) => {
-                if (!response.ok) {
-                    throw new Error("タスクの更新に失敗しました");
-                }
-                mutate(`${apiBaseUrl}/task`);
-            });
-        } catch (error) {
-            console.error(error);
-            alert("タスクの更新に失敗しました");
-        }
+			const updatedTask = {
+				...task,
+				is_completed: !task.is_completed,
+			};
+
+			const response = await fetch(`${apiBaseUrl}/task`, {
+				method: "PUT",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify(updatedTask),
+			});
+
+			if (!response.ok) {
+				const errorData: { message?: string } = await response.json();
+				throw new Error(errorData.message || "タスクの更新に失敗しました");
+			}
+
+			// SWRのキャッシュを再検証
+			mutate(`${apiBaseUrl}/task`);
+		} catch (error) {
+			console.error(error);
+			alert("タスクの更新に失敗しました");
+		}
 	};
 
 	const handleDelete = async (id: number) => {
