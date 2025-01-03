@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/ryosuke-horie/next-go-gcp-terraform-k8s-lab/models"
+	"github.com/ryosuke-horie/next-go-gcp-terraform-lab/models"
 )
 
 // TaskRepositoryインターフェースの実装として定義

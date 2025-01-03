@@ -7,8 +7,8 @@ import (
 	"os"
 
 	_ "github.com/lib/pq"
-	"github.com/ryosuke-horie/next-go-gcp-terraform-k8s-lab/models"
-	"github.com/ryosuke-horie/next-go-gcp-terraform-k8s-lab/repository"
+	"github.com/ryosuke-horie/next-go-gcp-terraform-lab/models"
+	"github.com/ryosuke-horie/next-go-gcp-terraform-lab/repository"
 )
 
 func main() {

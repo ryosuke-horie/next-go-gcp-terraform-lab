@@ -51,5 +51,5 @@ gcloud iam workload-identity-pools describe "github-pool" --project="plasma-rend
 gcloud iam service-accounts add-iam-policy-binding "terraform@plasma-renderer-446307-u5.iam.gserviceaccount.com" \
   --project="plasma-renderer-446307-u5" \
   --role="roles/iam.workloadIdentityUser" \
-  --member="principalSet://iam.googleapis.com/projects/191083186598/locations/global/workloadIdentityPools/github-pool/attribute.repository/ryosuke-horie/next-go-gcp-terraform-k8s-lab"
+  --member="principalSet://iam.googleapis.com/projects/191083186598/locations/global/workloadIdentityPools/github-pool/attribute.repository/ryosuke-horie/next-go-gcp-terraform-lab"
 ```
