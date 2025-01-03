@@ -41,8 +41,8 @@ resource "google_project_iam_member" "artifact_registry_admin" {
 # CloudSQL
 # 
 
-resource "google_sql_database_instance" "next-go-gcp-terraform-k8s-lab-db-instance" {
-  name             = "next-go-gcp-terraform-k8s-lab-db-instance"
+resource "google_sql_database_instance" "next-go-gcp-terraform-lab-db-instance" {
+  name             = "next-go-gcp-terraform-lab-db-instance"
   database_version = "POSTGRES_17"
   settings {
     edition = "ENTERPRISE" # v16以降は明示的に指定する
@@ -52,14 +52,14 @@ resource "google_sql_database_instance" "next-go-gcp-terraform-k8s-lab-db-instan
   deletion_protection = false
 }
 
-resource "google_sql_database" "next-go-gcp-terraform-k8s-lab-db" {
-  name     = "next-go-gcp-terraform-k8s-lab-db"
-  instance = google_sql_database_instance.next-go-gcp-terraform-k8s-lab-db-instance.name
+resource "google_sql_database" "next-go-gcp-terraform-lab-db" {
+  name     = "next-go-gcp-terraform-lab-db"
+  instance = google_sql_database_instance.next-go-gcp-terraform-lab-db-instance.name
 }
 
 resource "google_sql_user" "sql-user" {
   name     = "sql-user"
-  instance = google_sql_database_instance.next-go-gcp-terraform-k8s-lab-db-instance.name
+  instance = google_sql_database_instance.next-go-gcp-terraform-lab-db-instance.name
   password = var.db_password
 }
 
@@ -80,7 +80,7 @@ resource "google_cloud_run_v2_service" "default" {
     volumes {
       name = "cloudsql"
       cloud_sql_instance {
-        instances = [google_sql_database_instance.next-go-gcp-terraform-k8s-lab-db-instance.connection_name]
+        instances = [google_sql_database_instance.next-go-gcp-terraform-lab-db-instance.connection_name]
       }
     }
 
@@ -115,13 +115,13 @@ resource "google_cloud_run_v2_service" "default" {
 
       env {
         name  = "DB_NAME"
-        value = google_sql_database.next-go-gcp-terraform-k8s-lab-db.name
+        value = google_sql_database.next-go-gcp-terraform-lab-db.name
       }
 
       # DB_HOST は Cloud SQL の Unix ソケットパス
       env {
         name  = "DB_HOST"
-        value = "/cloudsql/plasma-renderer-446307-u5:asia-southeast1:next-go-gcp-terraform-k8s-lab-db-instance"
+        value = "/cloudsql/plasma-renderer-446307-u5:asia-southeast1:next-go-gcp-terraform-lab-db-instance"
       }
     }
   }

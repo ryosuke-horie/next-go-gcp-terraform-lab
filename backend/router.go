@@ -4,9 +4,9 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/ryosuke-horie/next-go-gcp-terraform-k8s-lab/handlers"
-	"github.com/ryosuke-horie/next-go-gcp-terraform-k8s-lab/middleware"
-	"github.com/ryosuke-horie/next-go-gcp-terraform-k8s-lab/repository"
+	"github.com/ryosuke-horie/next-go-gcp-terraform-lab/handlers"
+	"github.com/ryosuke-horie/next-go-gcp-terraform-lab/middleware"
+	"github.com/ryosuke-horie/next-go-gcp-terraform-lab/repository"
 )
 
 func NewRouter(repo repository.TaskRepository) http.Handler {

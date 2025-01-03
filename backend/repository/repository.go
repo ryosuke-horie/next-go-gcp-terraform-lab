@@ -3,7 +3,7 @@ package repository
 import (
 	"context"
 
-	"github.com/ryosuke-horie/next-go-gcp-terraform-k8s-lab/models"
+	"github.com/ryosuke-horie/next-go-gcp-terraform-lab/models"
 )
 
 // TaskRepository はタスクに対するDB操作のインターフェース

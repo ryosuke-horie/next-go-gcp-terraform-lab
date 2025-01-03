@@ -1,4 +1,4 @@
-# next-go-gcp-terraform-k8s-lab
+# next-go-gcp-terraform-lab
 
 このリポジトリは、Next.js / Go / GCP / Terraform / Kubernetes などを組み合わせた構成のハンズオン学習用プロジェクトです。
 フロントエンド、バックエンド、インフラまで一貫して小規模アプリを構築することで、各技術の連携方法を学ぶことを目的としています。
@@ -15,7 +15,7 @@
 ## ディレクトリ構成
 
 ```text
-next-go-gcp-terraform-k8s-lab/
+next-go-gcp-terraform-lab/
 ├─ frontend/ (Next.js + MUI + TypeScript + React Hook Form + zod)
 ├─ backend/ (Go + chi + xo によるAPI、PostgreSQL操作)
 │ ├─ internal/models (xo生成コード)
@@ -51,4 +51,4 @@ next-go-gcp-terraform-k8s-lab/
 <https://opennext.js.org/cloudflare>
 上記のテンプレートを利用し、Cloudflare Workersへデプロイ。
 
-<https://next-go-gcp-terraform-k8s-lab.ryosuke-horie37.workers.dev>
+<https://next-go-gcp-terraform-lab.ryosuke-horie37.workers.dev>

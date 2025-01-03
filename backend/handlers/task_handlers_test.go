@@ -9,8 +9,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ryosuke-horie/next-go-gcp-terraform-k8s-lab/models"
-	"github.com/ryosuke-horie/next-go-gcp-terraform-k8s-lab/repository"
+	"github.com/ryosuke-horie/next-go-gcp-terraform-lab/models"
+	"github.com/ryosuke-horie/next-go-gcp-terraform-lab/repository"
 )
 
 // TestCreateTaskHandler は CreateTaskHandler のテスト
