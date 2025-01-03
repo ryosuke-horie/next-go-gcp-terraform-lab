@@ -52,4 +52,9 @@ gcloud iam service-accounts add-iam-policy-binding "terraform@plasma-renderer-44
   --project="plasma-renderer-446307-u5" \
   --role="roles/iam.workloadIdentityUser" \
   --member="principalSet://iam.googleapis.com/projects/191083186598/locations/global/workloadIdentityPools/github-pool/attribute.repository/ryosuke-horie/next-go-gcp-terraform-lab"
+
+# principalSet://... に Service Account Token Creator を付与する
+gcloud iam service-accounts add-iam-policy-binding terraform@plasma-renderer-446307-u5.iam.gserviceaccount.com \
+  --role="roles/iam.serviceAccountTokenCreator" \
+  --member="principalSet://iam.googleapis.com/projects/191083186598/locations/global/workloadIdentityPools/github-pool/attribute.repository/ryosuke-horie/next-go-gcp-terraform-lab"
 ```
