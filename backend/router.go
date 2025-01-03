@@ -23,6 +23,8 @@ func NewRouter(repo repository.TaskRepository) http.Handler {
 	r.Get("/task", taskHandler.ListTaskHandler)
 	// Delete
 	r.Delete("/task", taskHandler.DeleteTaskHandler)
+	// Update
+	r.Put("/task", taskHandler.UpdateTaskHandler)
 
 	return r
 }

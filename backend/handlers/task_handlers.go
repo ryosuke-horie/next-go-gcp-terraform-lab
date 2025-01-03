@@ -134,3 +134,49 @@ func (h *TaskHandler) DeleteTaskHandler(w http.ResponseWriter, r *http.Request) 
 	// 削除成功時に204 No Contentを返す
 	w.WriteHeader(http.StatusNoContent)
 }
+
+func (h *TaskHandler) UpdateTaskHandler(w http.ResponseWriter, r *http.Request) {
+	var input struct {
+		ID          int    `json:"id"`
+		Title       string `json:"title"`
+		Detail      string `json:"detail"`
+		IsCompleted bool   `json:"is_completed"`
+	}
+
+	// リクエストボディをデコード
+	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
+		http.Error(w, "無効なリクエストボディ", http.StatusBadRequest)
+		return
+	}
+
+	// タスクを更新
+	task := &models.Task{
+		ID:          input.ID,
+		Title:       input.Title,
+		Detail:      sql.NullString{String: input.Detail, Valid: input.Detail != ""},
+		IsCompleted: input.IsCompleted,
+		CreatedAt:   time.Now(), // TODO: 作成日時は更新しない
+	}
+
+	// Update
+	if err := h.Repo.UpdateTask(r.Context(), task); err != nil {
+		log.Printf("タスクの更新に失敗しました。: %v", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	// TaskResponse にマッピング
+	response := TaskResponse{
+		ID:          task.ID,
+		Title:       task.Title,
+		Detail:      task.Detail.String, // sql.NullString から string を取得
+		IsCompleted: task.IsCompleted,
+		CreatedAt:   task.CreatedAt,
+	}
+
+	// 更新したタスクをレスポンスとして返す
+	w.Header().Set("Content-Type", "application/json")
+	if err := json.NewEncoder(w).Encode(response); err != nil {
+		log.Printf("レスポンスのエンコードに失敗しました。: %v", err)
+	}
+}

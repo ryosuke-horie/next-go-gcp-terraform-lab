@@ -62,3 +62,16 @@ func (r *TaskRepositoryImpl) DeleteTask(ctx context.Context, id int) error {
 
 	return task.Delete(ctx, r.DB)
 }
+
+// タスクの更新
+func (r *TaskRepositoryImpl) UpdateTask(ctx context.Context, task *models.Task) error {
+	// タスクを取得して存在確認
+	task, err := models.TaskByID(ctx, r.DB, task.ID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return fmt.Errorf("タスクが見つかりません")
+		}
+	}
+
+	return task.Update(ctx, r.DB)
+}

@@ -11,6 +11,7 @@ type MockTaskRepository struct {
 	CreateTaskFunc func(ctx context.Context, task *models.Task) error
 	ListTasksFunc  func(ctx context.Context) ([]models.Task, error)
 	DeleteTaskFunc func(ctx context.Context, id int) error
+	UpdateTaskFunc func(ctx context.Context, task *models.Task) error
 }
 
 func (m *MockTaskRepository) CreateTask(ctx context.Context, task *models.Task) error {
@@ -30,6 +31,13 @@ func (m *MockTaskRepository) ListTasks(ctx context.Context) ([]models.Task, erro
 func (m *MockTaskRepository) DeleteTask(ctx context.Context, id int) error {
 	if m.DeleteTaskFunc != nil {
 		return m.DeleteTaskFunc(ctx, id)
+	}
+	return nil
+}
+
+func (m *MockTaskRepository) UpdateTask(ctx context.Context, task *models.Task) error {
+	if m.UpdateTaskFunc != nil {
+		return m.UpdateTaskFunc(ctx, task)
 	}
 	return nil
 }
