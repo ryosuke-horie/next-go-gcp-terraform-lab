@@ -5,10 +5,16 @@ import { type TaskResponse, TaskResponseSchema } from "../types/Task";
 
 const Home = async () => {
 	try {
-		// Cloudflare Workersのコンテキストから環境変数を取得
-		const { env } = await getCloudflareContext();
-		const apiBaseUrl = env.NEXT_PUBLIC_API_BASE_URL;
-		console.log(apiBaseUrl);
+		let apiBaseUrl: string | undefined;
+
+		if (process.env.NODE_ENV === "development") {
+			// 開発環境では process.env から取得
+			apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+		} else {
+			// 本番環境では Cloudflare のコンテキストから取得
+			const { env } = await getCloudflareContext();
+			apiBaseUrl = env.NEXT_PUBLIC_API_BASE_URL;
+		}
 
 		if (!apiBaseUrl) {
 			throw new Error("NEXT_PUBLIC_API_BASE_URLが設定されていません。");

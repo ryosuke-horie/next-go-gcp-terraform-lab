@@ -12,7 +12,7 @@ import {
 	type TaskResponse,
 	TaskResponseSchema,
 } from "../types/Task";
-import TaskItem from "./TaskItem";
+import TaskItem from "./TaskItem"; // 修正後のコンポーネント名
 
 interface TaskListProps {
 	initialTasks: TaskResponse[];
@@ -85,8 +85,9 @@ const TaskList: React.FC<TaskListProps> = ({ initialTasks }) => {
 				const errorData: { message?: string } = await response.json();
 				throw new Error(errorData.message || "タスク追加に失敗しました");
 			}
-		} catch (error) {
-			alert("タスク作成に失敗しました");
+		} catch (error: any) {
+			// エラーメッセージを取得するため any に
+			alert(error.message || "タスク作成に失敗しました");
 		}
 
 		// swrキャッシュの再検証（最新を取得）
@@ -94,8 +95,43 @@ const TaskList: React.FC<TaskListProps> = ({ initialTasks }) => {
 		reset(); // フォームをリセット
 	};
 
-	const handleToggle = (id: number) => {
-		alert(id);
+	// 更新処理
+	const handleToggle = async (id: number) => {
+		try {
+			const task = tasks.find((task) => task.id === id);
+			if (!task) {
+				throw new Error("タスクが見つかりません");
+			}
+
+			const updatedTask = {
+				...task,
+				is_completed: !task.is_completed,
+			};
+
+			console.log("Updating task:", updatedTask);
+
+			const response = await fetch(`${apiBaseUrl}/task`, {
+				method: "PUT",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify(updatedTask),
+			});
+
+			console.log("Response status:", response.status);
+
+			if (!response.ok) {
+				const errorData: { message?: string } = await response.json();
+				throw new Error(errorData.message || "タスクの更新に失敗しました");
+			}
+
+			// SWRのキャッシュを再検証
+			mutate(`${apiBaseUrl}/task`);
+		} catch (error: any) {
+			// エラーメッセージを取得するため any に
+			console.error("Error updating task:", error);
+			alert(error.message || "タスクの更新に失敗しました");
+		}
 	};
 
 	const handleDelete = async (id: number) => {
@@ -115,9 +151,10 @@ const TaskList: React.FC<TaskListProps> = ({ initialTasks }) => {
 
 			// SWRのキャッシュを再検証
 			mutate(`${apiBaseUrl}/task`);
-		} catch (error) {
+		} catch (error: any) {
+			// エラーメッセージを取得するため any に
 			console.error(error);
-			alert("失敗しました。");
+			alert(error.message || "失敗しました。");
 		}
 	};
 
